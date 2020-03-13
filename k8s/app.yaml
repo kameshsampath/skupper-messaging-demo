@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: skupper-messaging-demo
+spec:
+  selector:
+    app: skupper-messaging-demo
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skupper-messaging-demo
+spec:
+  selector:
+    matchLabels:
+      app: skupper-messaging-demo
+  template:
+    metadata:
+      labels:
+        app: skupper-messaging-demo
+    spec:
+      containers:
+        - name: skupper-messaging-demo
+          image: rhdevelopers/skupper-messaging-demo
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - mountPath: /etc/messaging
+              name: skupper-amqp-trust
+      volumes:
+        - name: skupper-amqp-trust
+          secret:
+            secretName: skupper

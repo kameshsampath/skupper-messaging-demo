@@ -1,0 +1,13 @@
+apiVersion: skaffold/v1
+kind: Config
+metadata:
+  name: skupper-messaging-demo
+build:
+  artifacts:
+    - image: rhdevelopers/skupper-messaging-demo
+  local:
+    push: false
+deploy:
+  kubectl:
+    manifests:
+      - k8s/app.yaml
