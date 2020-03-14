@@ -77,13 +77,6 @@ public class Main {
                 System.out
                     .println("Message sent successfully to "
                         + message.address());
-                ar.result().createReceiver(message.address(),
-                    done -> {
-                      if (done.failed()) {
-                        System.err.println(
-                            "Unable to receive message");
-                      }
-                    });
               } else {
                 System.out.println("Message sent failed");
               }
