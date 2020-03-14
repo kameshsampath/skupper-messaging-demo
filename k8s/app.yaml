@@ -25,8 +25,11 @@ spec:
     spec:
       containers:
         - name: skupper-messaging-demo
-          image: rhdevelopers/skupper-messaging-demo
+          image: quay.io/rhdevelopers/skupper-messaging-demo
           imagePullPolicy: IfNotPresent
+          env:
+           - name: JAVA_OPTIONS
+             value: -Djavax.net.debug=ssl,handshake
           ports:
             - containerPort: 8080
           volumeMounts:

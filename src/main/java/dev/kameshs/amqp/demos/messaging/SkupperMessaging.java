@@ -1,7 +1,6 @@
 package dev.kameshs.amqp.demos.messaging;
 
 import static java.util.logging.Level.FINE;
-import java.io.File;
 import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
@@ -10,7 +9,6 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import io.vertx.amqp.AmqpClientOptions;
 import io.vertx.core.net.PemKeyCertOptions;
 import io.vertx.core.net.PemTrustOptions;
-import io.vertx.core.net.TrustOptions;
 
 /**
  * SkupperMessaging
@@ -56,8 +54,6 @@ public class SkupperMessaging {
 
     options
         .setSsl(true)
-        .setConnectTimeout(10000)
-        .setReconnectInterval(5000)
         .addEnabledSaslMechanism("EXTERNAL") // SASL EXTERNAL
         .setPemTrustOptions(pTrustOptions) // Trust options use ca.crt
         .setPemKeyCertOptions(pCertOptions)// Cert options use tls.crt/tls.key
@@ -65,9 +61,6 @@ public class SkupperMessaging {
         .setPort(port)
         .setHost(host)
         .setContainerId("skupper-msg");
-
-
-
     return options;
   }
 

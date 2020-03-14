@@ -1,0 +1,49 @@
+version: "3.7"
+services:
+  # quarkus-app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.jvm
+  #     # Enable to map to your local env
+  #     # args:
+  #     #   MAVEN_MIRROR_URL: http://192.168.1.2:8081/repository/maven-public/
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./skupper:/etc/messaging
+  skupper-messaging:
+    image: "quay.io/interconnectedcloud/qdrouterd"
+    environment:
+      QDROUTERD_CONF: |2+
+            router {
+              mode: edge
+              id: kamesh-local-${HOSTNAME}
+            }
+            listener {
+                host: localhost
+                port: 5672
+                role: normal
+            }
+            listener {
+                host: 0.0.0.0
+                port: 5671
+                role: normal
+                sslProfile: skupper-amqps
+                saslMechanisms: EXTERNAL
+                authenticatePeer: true
+            }
+            address {
+                prefix: mc
+                distribution: multicast
+            }
+            sslProfile {
+                name: skupper-amqps
+                certFile: /etc/messaging/tls.crt
+                privateKeyFile: /etc/messaging/tls.key
+                caCertFile: /etc/messaging/ca.crt
+            }
+    ports:
+      - "5672:5672"
+      - "5671:5671"
+    volumes:
+      - ./skupper:/etc/messaging

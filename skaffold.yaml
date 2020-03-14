@@ -4,9 +4,7 @@ metadata:
   name: skupper-messaging-demo
 build:
   artifacts:
-    - image: rhdevelopers/skupper-messaging-demo
-  local:
-    push: false
+    - image: quay.io/rhdevelopers/skupper-messaging-demo
 deploy:
   kubectl:
     manifests:

@@ -1,10 +1,15 @@
 package dev.kameshs.amqp.demos.messaging;
 
-import static java.util.logging.Level.*;
+import static java.util.logging.Level.INFO;
 import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.json.bind.Jsonb;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
-import io.smallrye.reactive.messaging.amqp.AmqpMessage;
+import org.eclipse.microprofile.reactive.messaging.Message;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+import dev.kameshs.amqp.demos.data.Game;
+import io.smallrye.reactive.messaging.annotations.Broadcast;
 
 /**
  * GameMessageSubscriber
@@ -14,8 +19,18 @@ public class GameMessageSubscriber {
 
   Logger logger = Logger.getLogger(GameMessageSubscriber.class.getName());
 
+  @Inject
+  Jsonb jsonb;
+
   @Incoming("game-state")
-  public void recevieGameState(String payload) {
-    logger.log(INFO, "Recevied message {0}", payload);
+  @Outgoing("game-state-logger")
+  @Broadcast
+  public Game recevieGameState(String msg) {
+    return jsonb.fromJson(msg, Game.class);
+  }
+
+  @Incoming("game-state-logger")
+  public void logGameStates(Game game) {
+    logger.log(INFO, "Recevied message {0}", jsonb.toJson(game));
   }
 }

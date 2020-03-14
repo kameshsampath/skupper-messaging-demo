@@ -24,7 +24,7 @@ public class MessageGenerator {
         .map(tick -> {
           Game game = new Game();
           game.id = UUID.randomUUID().toString();
-          game.state = "active";
+          game.state = "lobby";
           String msg = jsonb.toJson(game);
           logger.info("Sending " + msg);
           return msg;
