@@ -1,14 +1,13 @@
 package dev.kameshs;
 
-import io.vertx.amqp.AmqpClient;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 import io.vertx.amqp.AmqpClientOptions;
-import io.vertx.amqp.AmqpMessage;
-import io.vertx.amqp.AmqpMessageBuilder;
-import io.vertx.amqp.AmqpReceiver;
-import io.vertx.amqp.AmqpSender;
-import io.vertx.core.Vertx;
+import io.vertx.axle.amqp.*;
 import io.vertx.core.net.PemKeyCertOptions;
 import io.vertx.core.net.PemTrustOptions;
+import io.vertx.reactivex.core.Vertx;
 
 /**
  * Main
@@ -16,7 +15,6 @@ import io.vertx.core.net.PemTrustOptions;
 public class Main {
 
   private static final String AMQP_HOST = "localhost";
-  private static final int AMQP_5672 = 5672;
   private static final int AMQP_5671 = 5671;
   private static final String MC_GAME = "game";
 
@@ -38,16 +36,17 @@ public class Main {
     PemTrustOptions pTrustOptions =
         new PemTrustOptions()
             .addCertPath(
-                "./skupper/ca.crt"); // ca.crt
+                "/Users/kameshs/MyLabs/quarkus/demos/amqp/skupper-messaging-demo/skupper/ca.crt"); // ca.crt
 
     PemKeyCertOptions pCertOptions = new PemKeyCertOptions()
         .addCertPath(
-            "./skupper/tls.crt") // tls.crt
+            "/Users/kameshs/MyLabs/quarkus/demos/amqp/skupper-messaging-demo/skupper/tls.crt") // tls.crt
         .addKeyPath(
-            "./skupper/tls.key"); // tls.key
+            "/Users/kameshs/MyLabs/quarkus/demos/amqp/skupper-messaging-demo/skupper/tls.key"); // tls.key
 
     // options.getEnabledSecureTransportProtocols().forEach(p -> logger.info(p));
     // options.getEnabledSaslMechanisms().forEach(sp -> logger.info(sp));
+
 
     options
         .setSsl(true)
@@ -61,50 +60,34 @@ public class Main {
         .setHost(AMQP_HOST)
         .setContainerId("skupper-msg");
 
-    AmqpClient client = AmqpClient.create(options);
+    AmqpClient client = AmqpClient
+        .create(new io.vertx.axle.core.Vertx(vertx.getDelegate()), options);
     final AmqpMessageBuilder builder = AmqpMessage.create();
     final AmqpMessage message = builder.withBody("hello")
         .address(MC_GAME).build();
 
-    client.connect(ar -> {
-      if (ar.succeeded()) {
+    AtomicReference<AmqpSender> sender = new AtomicReference<>();
 
-        ar.result().createAnonymousSender(sent -> {
-          if (sent.succeeded()) {
-            AmqpSender aSender = sent.result();
-            aSender.sendWithAck(message, ack -> {
-              if (ack.succeeded()) {
-                System.out
-                    .println("Message sent successfully to "
-                        + message.address());
-              } else {
-                System.out.println("Message sent failed");
-              }
-            });
-          }
+    CompletionStage<AmqpMessage> cSender = client.connect()
+        .thenCompose(AmqpConnection::createAnonymousSender)
+        .thenApply(s -> {
+          sender.set(s);
+          return s;
+        })
+        .thenCompose(s -> {
+          return s
+              .sendWithAck(message)
+              .thenApply(ack -> message.accepted());
         });
-
-        ar.result().createReceiver(MC_GAME, done -> {
-          if (done.failed()) {
-            System.err.println("Unable to receive message");
-          }
-
-          if (done.succeeded()) {
-            AmqpReceiver receiver = done.result();
-            receiver.handler(msg -> {
-              // called on every received messages
-              System.out
-                  .println("Received " + msg.bodyAsString());
-            });
-          }
-        });
-      } else {
-        System.out.println("Unable to establish connection");
-        ar.result().exceptionHandler(handler -> {
-          handler.getCause().printStackTrace();
-        });
-      }
-    });
+    try {
+      cSender.toCompletableFuture().get();
+    } catch (InterruptedException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (ExecutionException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 
   }
 }

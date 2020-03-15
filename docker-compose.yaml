@@ -43,7 +43,6 @@ services:
                 caCertFile: /etc/messaging/ca.crt
             }
     ports:
-      - "5672:5672"
       - "5671:5671"
     volumes:
       - ./skupper:/etc/messaging

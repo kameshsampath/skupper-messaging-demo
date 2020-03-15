@@ -2,7 +2,9 @@ package dev.kameshs.amqp.demos.messaging;
 
 import static java.util.logging.Level.FINE;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -34,34 +36,24 @@ public class SkupperMessaging {
   int port;
 
   @Produces
-  @Named("skupper-amqp-messaging")
+  @Named("qpid-amqp")
   public AmqpClientOptions clientOptions() {
     logger.log(FINE, "AMQP Configuring with host {0} and port {1} ",
         new Object[] {host,
             port});
-    AmqpClientOptions options = new AmqpClientOptions();
 
-    PemTrustOptions pTrustOptions =
-        new PemTrustOptions()
-            .addCertPath(caCertPath); // ca.crt
-
-    PemKeyCertOptions pCertOptions = new PemKeyCertOptions()
-        .addCertPath(certPath) // tls.crt
-        .addKeyPath(keyPath); // tls.key
-
-    // options.getEnabledSecureTransportProtocols().forEach(p -> logger.info(p));
-    // options.getEnabledSaslMechanisms().forEach(sp -> logger.info(sp));
-
-    options
+    return new AmqpClientOptions()
         .setSsl(true)
         .addEnabledSaslMechanism("EXTERNAL") // SASL EXTERNAL
-        .setPemTrustOptions(pTrustOptions) // Trust options use ca.crt
-        .setPemKeyCertOptions(pCertOptions)// Cert options use tls.crt/tls.key
+        .setPemTrustOptions(new PemTrustOptions()
+            .addCertPath(caCertPath)) // Trust options use ca.crt
+        .setPemKeyCertOptions(new PemKeyCertOptions()
+            .addCertPath(certPath) // tls.crt
+            .addKeyPath(keyPath))// Cert options use tls.crt/tls.key
         .setHostnameVerificationAlgorithm("")
         .setPort(port)
         .setHost(host)
         .setContainerId("skupper-messaging-demo");
-    return options;
   }
 
 }
