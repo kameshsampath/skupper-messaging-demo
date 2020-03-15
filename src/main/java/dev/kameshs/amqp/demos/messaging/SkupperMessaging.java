@@ -60,7 +60,7 @@ public class SkupperMessaging {
         .setHostnameVerificationAlgorithm("")
         .setPort(port)
         .setHost(host)
-        .setContainerId("skupper-msg");
+        .setContainerId("skupper-messaging-demo");
     return options;
   }
 

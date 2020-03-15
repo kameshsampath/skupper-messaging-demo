@@ -17,7 +17,7 @@ services:
       QDROUTERD_CONF: |2+
             router {
               mode: edge
-              id: kamesh-local-${HOSTNAME}
+              id: kamesh-local-$$HOSTNAME
             }
             listener {
                 host: localhost
