@@ -6,7 +6,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.eclipse.microprofile.reactive.messaging.Message;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import dev.kameshs.amqp.demos.data.Game;
 import io.smallrye.reactive.messaging.annotations.Broadcast;
@@ -14,7 +13,7 @@ import io.smallrye.reactive.messaging.annotations.Broadcast;
 /**
  * GameMessageSubscriber
  */
-@ApplicationScoped
+// @ApplicationScoped
 public class GameMessageSubscriber {
 
   Logger logger = Logger.getLogger(GameMessageSubscriber.class.getName());
@@ -22,14 +21,14 @@ public class GameMessageSubscriber {
   @Inject
   Jsonb jsonb;
 
-  @Incoming("game-state")
-  @Outgoing("game-state-logger")
-  @Broadcast
+  // @Incoming("game-state")
+  // @Outgoing("game-state-logger")
+  // @Broadcast
   public Game recevieGameState(String msg) {
     return jsonb.fromJson(msg, Game.class);
   }
 
-  @Incoming("game-state-logger")
+  // @Incoming("game-state-logger")
   public void logGameStates(Game game) {
     logger.log(INFO, "Recevied message {0}", jsonb.toJson(game));
   }

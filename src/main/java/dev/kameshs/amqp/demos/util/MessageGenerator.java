@@ -18,7 +18,7 @@ public class MessageGenerator {
   @Inject
   Jsonb jsonb;
 
-  @Outgoing("game-state-sender")
+  @Outgoing("game")
   public Flowable<String> generate() {
     return Flowable.interval(10, TimeUnit.SECONDS)
         .map(tick -> {
