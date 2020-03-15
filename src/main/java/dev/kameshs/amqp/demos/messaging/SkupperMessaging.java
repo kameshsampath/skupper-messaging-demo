@@ -15,6 +15,7 @@ import io.vertx.core.net.PemTrustOptions;
 /**
  * SkupperMessaging
  */
+@ApplicationScoped
 public class SkupperMessaging {
 
   Logger logger = Logger.getLogger(SkupperMessaging.class.getName());

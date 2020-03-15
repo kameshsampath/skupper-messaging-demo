@@ -1,0 +1,44 @@
+= AMQP with TLS/SASL
+
+This project uses Quarkus, the Supersonic Subatomic Java Framework.
+
+If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+
+== Generate certificates
+
+To generate self signed certificates, you can use https://github.com/cloudflare/cfssl[cfssl]
+
+[source,bash]
+----
+cd skupper
+# generate ca certs
+cfssl gencert -ca ca.pem -ca-key ca-key.pem  csr.json
+# generate server certs
+cfssl gencert -ca ca.pem -ca-key ca-key.pem  csr.json | cfssljson -bare server 
+# rename the certs
+mv ca.pem ca.crt 
+mv server-key.pem tls.key
+mv server.pem tls.crt
+----
+
+== Start the qupid router
+
+[source,bash]
+----
+docker-commpose up
+----
+
+The command should start the router in and attach to `localhost:5671`
+
+== Running the application in dev mode
+
+You can run your application in dev mode that enables live coding using:
+
+[source,bash]
+----
+./mvnw compile quarkus:dev
+----
+
+To send a message you can use httpie, `http :8080/api/send id=1001 state='active'`
+
+You should start seeing send and receive message logs on the console.
