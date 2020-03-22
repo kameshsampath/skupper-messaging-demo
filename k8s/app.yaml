@@ -27,9 +27,17 @@ spec:
         - name: skupper-messaging-demo
           image: quay.io/rhdevelopers/skupper-messaging-demo
           imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
           env:
-           - name: JAVA_OPTIONS
-             value: -Djavax.net.debug=ssl,handshake
+            - name: JAVA_OPTIONS
+              value: -Djavax.net.debug=ssl,handshake
           ports:
             - containerPort: 8080
           volumeMounts:

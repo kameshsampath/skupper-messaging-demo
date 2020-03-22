@@ -12,7 +12,7 @@ import dev.kameshs.amqp.demos.data.Game;
 /**
  * GameMessageSubscriber
  */
-@ApplicationScoped
+// @ApplicationScoped
 public class GameMessageSubscriber {
 
   Logger logger = Logger.getLogger(GameMessageSubscriber.class.getName());
@@ -20,13 +20,13 @@ public class GameMessageSubscriber {
   @Inject
   Jsonb jsonb;
 
-  @Incoming("game-state")
-  @Outgoing("game-state-logger")
+  // @Incoming("game-state")
+  // @Outgoing("game-state-logger")
   public Game recevieGameState(String msg) {
     return jsonb.fromJson(msg, Game.class);
   }
 
-  @Incoming("game-state-logger")
+  // @Incoming("game-state-logger")
   public void logGameStates(Game game) {
     logger.log(INFO, "Recevied message {0}", jsonb.toJson(game));
   }
